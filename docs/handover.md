@@ -88,12 +88,19 @@ curl -sL https://huggingface.co/datasets/yuiseki/un-pko-deployments/resolve/main
 
 公開 (`hf upload`) には、書き込み権限のある Hugging Face の認証が要る。読み取りだけなら、認証なしで公開データもリポジトリも読める。そのため、読めることは書き込めることの証拠にならない。アップロードの段になって初めて認証エラーになる。
 
-- 所有者のシェルでは `huggingface-cli whoami` が `yuiseki` を返し、ログイン済みである。コマンドは anaconda3 の中にある (`~/anaconda3/bin/huggingface-cli`)。
-- エージェントの実行環境では、同じ認証が見えないことがある。Codex では `huggingface-cli: command not found` になり、`uvx --from huggingface_hub hf auth whoami` も未ログインと答えた。PATH に anaconda3 が入っていない、HOME が違う、サンドボックスが認証ファイルを読めない、といった環境の差が疑われる (原因は確かめていない)。
-- 公開の前に、自分の環境で `whoami` を流し、`yuiseki` が出るかを確かめる。`command not found` なら、まず `~/anaconda3/bin/huggingface-cli whoami` と、フルパスで呼ぶ。
-- それでも未ログインなら、トークンや認証ファイルを探し回らない。人の資格情報を探す操作は、エージェントの環境では拒否されることがある。所有者に、自分のシェルでの実行を頼む。
-- `source ~/.bashrc` や `source ~/.env` を前に付けても、ログイン済みになるとは限らない。
-- トークンを会話や記録に貼らない。
+認証の置き場所は、環境変数 `HF_HOME` で `/everything/huggingface_cache` に移してある (所有者の `~/.bashrc` で `export` している)。既定の `~/.cache/huggingface` は root 所有の別物で、トークンは入っていない。
+
+- `HF_HOME` が届かないシェルでは、未ログインになる。2026-11-06 に Codex のシェルで、`~/.bashrc` と `~/.env` を `source` しても未ログインだった。`HF_HOME=/everything/huggingface_cache` をコマンドの前に付けると、`yuiseki` と出てアップロードできた。
+- `huggingface-cli` は anaconda3 の中にある (`~/anaconda3/bin/huggingface-cli`)。非対話のシェルでは PATH に入らず、`command not found` になることがある。フルパスで呼ぶ。`uvx --from huggingface_hub hf ...` でもよいが、同じく `HF_HOME` が要る。
+- 公開の前に、実データを触る前に、次を流して `yuiseki` が出るかを確かめる。
+
+  ```sh
+  HF_HOME=/everything/huggingface_cache ~/anaconda3/bin/huggingface-cli whoami
+  ```
+
+  アップロードも、同じ `HF_HOME` を付けて流す。
+- `source ~/.bashrc` が `HF_HOME` を出さない理由は、確かめていない。`source` に頼らず、明示する。
+- 明示しても未ログインなら、トークンや認証ファイルを探し回らず、所有者に頼む。人の資格情報を探す操作は、エージェントの環境では拒否されることがある。トークンを会話や記録に貼らない。
 - 認証待ちで止まるときは、組み立て、テスト、git の push まで終えた状態で止め、上げる 1 コマンドだけを所有者に渡す。
 
 ## カードの書き方
