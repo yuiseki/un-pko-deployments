@@ -88,12 +88,13 @@ curl -sL https://huggingface.co/datasets/yuiseki/un-pko-deployments/resolve/main
 
 公開 (`hf upload`) には、書き込み権限のある Hugging Face の認証が要る。読み取りだけなら、認証なしで公開データもリポジトリも読める。そのため、読めることは書き込めることの証拠にならない。アップロードの段になって初めて認証エラーになる。
 
-- `huggingface-cli` というコマンドは入っていないことがある。`command not found` になる。旧名なので、探さずに `uvx --from huggingface_hub hf ...` を使う。
-- `source ~/.bashrc` や `source ~/.env` を前に付けても、トークンが入るとは限らない。読み込めたことと、ログイン済みであることは別である。
-- 最初に、実データを触る前に `uvx --from huggingface_hub hf auth whoami` を流し、書き込みの資格 (ユーザー名 `yuiseki`) が出るかを確かめる。出なければ、公開の前の段階で分かる。
-- 未ログインのときは、トークンや認証ファイルを探し回らない。人の資格情報を探す操作は、エージェントの環境では拒否されることがある。ユーザーに、プロンプトで `! uvx --from huggingface_hub hf auth login` を打ってもらう (対話の入力がいる)。トークンを会話や記録に貼らない。
-- エージェントごと (Claude Code、Codex など) にシェルの環境が違う。あるエージェントで認証済みでも、別のエージェントでは未ログインのことがある。引き継いだら、必ず自分の環境で `whoami` をやり直す。
-- 認証待ちで止まるときは、作業を作り終えた状態 (`data/` の組み立て、テスト、git の push まで) で止め、上げる 1 コマンドだけをユーザーに渡す。
+- 所有者のシェルでは `huggingface-cli whoami` が `yuiseki` を返し、ログイン済みである。コマンドは anaconda3 の中にある (`~/anaconda3/bin/huggingface-cli`)。
+- エージェントの実行環境では、同じ認証が見えないことがある。Codex では `huggingface-cli: command not found` になり、`uvx --from huggingface_hub hf auth whoami` も未ログインと答えた。PATH に anaconda3 が入っていない、HOME が違う、サンドボックスが認証ファイルを読めない、といった環境の差が疑われる (原因は確かめていない)。
+- 公開の前に、自分の環境で `whoami` を流し、`yuiseki` が出るかを確かめる。`command not found` なら、まず `~/anaconda3/bin/huggingface-cli whoami` と、フルパスで呼ぶ。
+- それでも未ログインなら、トークンや認証ファイルを探し回らない。人の資格情報を探す操作は、エージェントの環境では拒否されることがある。所有者に、自分のシェルでの実行を頼む。
+- `source ~/.bashrc` や `source ~/.env` を前に付けても、ログイン済みになるとは限らない。
+- トークンを会話や記録に貼らない。
+- 認証待ちで止まるときは、組み立て、テスト、git の push まで終えた状態で止め、上げる 1 コマンドだけを所有者に渡す。
 
 ## カードの書き方
 
