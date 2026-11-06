@@ -9,3 +9,5 @@ python scripts/build.py --src <Geo-Ref-skills GeoJSON dir> --year 2025 --refs <U
 hf upload yuiseki/un-pko-deployments data . --repo-type dataset
 uvx --with pytest pytest -q tests
 ```
+
+How it is made, and by what rules: [docs/handover.md](docs/handover.md) (Japanese).
